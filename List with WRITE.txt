@@ -1,0 +1,71 @@
+REPORT Z_WRITE LINE-SIZE  62.
+
+DATA:
+  gt_sflight TYPE STANDARD TABLE OF sflight,
+  gs_sflight LIKE LINE OF gt_sflight,
+  gv_rownr   TYPE i.
+
+SELECT-OPTIONS: so_carr FOR gs_sflight-carrid NO-EXTENSION NO INTERVALS,
+                so_conn FOR gs_sflight-connid NO-EXTENSION NO INTERVALS,
+                so_flda FOR gs_sflight-fldate NO-EXTENSION NO INTERVALS,
+                so_rwnr FOR gv_rownr DEFAULT 500 OBLIGATORY  NO-EXTENSION NO INTERVALS.
+
+
+TOP-OF-PAGE. "Header
+
+  WRITE:
+   AT  1'Airline Code'             COLOR 1,
+   AT 14'Flight Connection Number' COLOR 2,
+   AT 40'Flight Date'              COLOR 3.
+
+  ULINE.
+
+  WRITE / sy-uline.
+
+
+START-OF-SELECTION.
+
+  SELECT * FROM sflight
+  INTO CORRESPONDING FIELDS OF TABLE gt_sflight
+  UP TO so_rwnr-low ROWS
+      WHERE carrid IN so_carr
+        AND connid IN so_conn
+        AND fldate IN so_flda.
+
+
+  LOOP AT gt_sflight ASSIGNING FIELD-SYMBOL(<ls_sflight>).
+
+    NEW-LINE.
+
+    WRITE:
+     AT  1 '|', "FRAME
+     AT  2 <ls_sflight>-carrid,
+     AT 14 <ls_sflight>-connid,
+     AT 40 <ls_sflight>-fldate.
+
+    IF <ls_sflight>-seatsmax EQ <ls_sflight>-seatsocc.              "ICON
+      WRITE AT 60 icon_led_red AS ICON.
+    ELSEIF ( <ls_sflight>-seatsmax - <ls_sflight>-seatsocc ) LE 10.
+      WRITE AT 60 icon_led_yellow AS ICON.
+    ELSE.
+      WRITE AT 60 icon_led_green AS ICON.
+    ENDIF.
+
+    WRITE AT 62 '|'. "FRAME
+
+    IF sy-tabix MOD 100 EQ 0.
+
+      ULINE.
+      NEW-PAGE.
+
+    ENDIF.
+
+  ENDLOOP.
+
+* Footer
+  NEW-LINE.
+  DO sy-linsz TIMES.
+
+    WRITE '~' NO-GAP.
+
+  ENDDO.
