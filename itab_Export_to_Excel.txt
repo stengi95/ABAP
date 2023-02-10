@@ -1,0 +1,71 @@
+FORM export_to_excel.
+
+  DATA:
+    lv_filename     TYPE string,
+    lv_fullpath     TYPE string,
+    lv_path         TYPE string,
+    lv_user_action  TYPE i.
+**********************************************************************
+
+  TRY.
+      cl_gui_frontend_services=>file_save_dialog(
+        EXPORTING
+          window_title              =   'Export to Excel'
+          default_extension         =   'XLSX'
+          default_file_name         =   |{ sy-repid }_{ sy-datlo }_{ sy-uzeit }.xlsx|
+          file_filter               =   '(*.xls,*.xlsx)|*.xls*'
+        CHANGING
+          filename                  =    lv_filename
+          path                      =    lv_path
+          fullpath                  =    lv_fullpath
+          user_action               =    lv_user_action
+        EXCEPTIONS
+          cntl_error                = 1
+          error_no_gui              = 2
+          not_supported_by_gui      = 3
+          invalid_default_file_name = 4
+          OTHERS                    = 5   ).
+      IF sy-subrc NE 0.
+        MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                   WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+
+      CASE lv_user_action.
+        WHEN 0. "Action OK.
+        WHEN 9. "Action cancel.
+          MESSAGE text-e01 TYPE 'E'. "Export canceled!
+      ENDCASE.
+
+
+      DATA lo_excel TYPE REF TO zcl_excel.
+
+      DATA(lo_converter) = NEW zcl_excel_converter( ).
+
+      lo_converter->convert( EXPORTING  it_table      =     gt_data
+                             CHANGING   co_excel      =     lo_excel ).
+
+      DATA(lo_excel_worksheet) = lo_excel->get_active_worksheet( ).
+
+      lo_excel_worksheet->freeze_panes( EXPORTING ip_num_rows = 1 ).
+
+      DATA(lo_excel_writer) = CAST zif_excel_writer( NEW zcl_excel_writer_2007( ) ). "xlsx
+      DATA(lv_excel_xdata)  = lo_excel_writer->write_file( lo_excel ).
+      DATA(lt_raw_data)     = cl_bcs_convert=>xstring_to_solix( EXPORTING iv_xstring = lv_excel_xdata ).
+
+      cl_gui_frontend_services=>gui_download(
+        EXPORTING
+          filename                  =  lv_filename
+          filetype                  = 'BIN'
+          bin_filesize              =  xstrlen( lv_excel_xdata )
+        CHANGING
+          data_tab                  =  lt_raw_data ).
+
+    CATCH cx_root INTO DATA(error_text).
+
+      MESSAGE error_text TYPE 'E'.
+
+  ENDTRY.
+
+  MESSAGE text-e02 TYPE 'S'. "Successful Excel export!
+
+ENDFORM.
