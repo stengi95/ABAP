@@ -1,10 +1,13 @@
+**************************************************
+**      Form  EXPORT_TO_EXCEL
+**************************************************
 FORM export_to_excel.
-
   DATA:
     lv_filename     TYPE string,
     lv_fullpath     TYPE string,
     lv_path         TYPE string,
-    lv_user_action  TYPE i.
+    lv_user_action  TYPE i,
+    lv_window_title TYPE string.
 **********************************************************************
 
   TRY.
@@ -33,7 +36,7 @@ FORM export_to_excel.
       CASE lv_user_action.
         WHEN 0. "Action OK.
         WHEN 9. "Action cancel.
-          MESSAGE text-e01 TYPE 'E'. "Export canceled!
+          MESSAGE TEXT-e01 TYPE 'E'. "Export canceled!
       ENDCASE.
 
 
@@ -41,10 +44,26 @@ FORM export_to_excel.
 
       DATA(lo_converter) = NEW zcl_excel_converter( ).
 
-      lo_converter->convert( EXPORTING  it_table      =     gt_data
+      lo_converter->convert( EXPORTING  it_table      =     gt_excel
                              CHANGING   co_excel      =     lo_excel ).
 
       DATA(lo_excel_worksheet) = lo_excel->get_active_worksheet( ).
+      "Overwrite first the header
+      lo_excel_worksheet->set_cell( ip_column = 'A' ip_row = 1 ip_value = TEXT-h01 ). "Material
+      lo_excel_worksheet->set_cell( ip_column = 'B' ip_row = 1 ip_value = TEXT-h02 ). "Description
+      lo_excel_worksheet->set_cell( ip_column = 'C' ip_row = 1 ip_value = TEXT-h03 ). "Material type
+      lo_excel_worksheet->set_cell( ip_column = 'D' ip_row = 1 ip_value = TEXT-h04 ). "Base Unit of Measure
+      lo_excel_worksheet->set_cell( ip_column = 'E' ip_row = 1 ip_value = TEXT-h05 ). "Plant
+      lo_excel_worksheet->set_cell( ip_column = 'F' ip_row = 1 ip_value = TEXT-h06 ). "Row type
+      lo_excel_worksheet->set_cell( ip_column = 'G' ip_row = 1 ip_value = jahr1    ).
+      lo_excel_worksheet->set_cell( ip_column = 'H' ip_row = 1 ip_value = jahr2    ).
+      lo_excel_worksheet->set_cell( ip_column = 'I' ip_row = 1 ip_value = jahr3    ).
+      lo_excel_worksheet->set_cell( ip_column = 'J' ip_row = 1 ip_value = jahr4    ).
+      lo_excel_worksheet->set_cell( ip_column = 'K' ip_row = 1 ip_value = jahr5    ).
+      lo_excel_worksheet->set_cell( ip_column = 'L' ip_row = 1 ip_value = jahr6    ).
+      lo_excel_worksheet->set_cell( ip_column = 'M' ip_row = 1 ip_value = jahr7    ).
+      lo_excel_worksheet->set_cell( ip_column = 'N' ip_row = 1 ip_value = TEXT-h14 ). "First Class
+      lo_excel_worksheet->set_cell( ip_column = 'O' ip_row = 1 ip_value = TEXT-h15 ). "Number of classes
 
       lo_excel_worksheet->freeze_panes( EXPORTING ip_num_rows = 1 ).
 
@@ -66,6 +85,6 @@ FORM export_to_excel.
 
   ENDTRY.
 
-  MESSAGE text-e02 TYPE 'S'. "Successful Excel export!
+  MESSAGE TEXT-s01 TYPE 'S'. "Successful Excel download!
 
 ENDFORM.
