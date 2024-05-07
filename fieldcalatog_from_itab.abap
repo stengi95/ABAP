@@ -30,7 +30,7 @@ CLASS zca_cl_alv IMPLEMENTATION.
 ENDCLASS.
 
 START-OF-SELECTION.
-   Get data from any table
+  "Get data from any table
   SELECT  FROM sflight INTO TABLE @DATA(gt_sflight) UP TO 50 ROWS.
 
   "Create field catalog from an internal table
