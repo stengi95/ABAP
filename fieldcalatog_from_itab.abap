@@ -7,7 +7,7 @@ CLASS zca_cl_alv DEFINITION.
 ENDCLASS.
 
 CLASS zca_cl_alv IMPLEMENTATION.
-  CLASS-METHOD create_fieldcatalog_from_itab.
+  METHOD create_fieldcatalog_from_itab.
     DATA lo_table_desc TYPE REF TO cl_abap_structdescr.
     DATA ls_table_line TYPE REF TO data.
     DATA lt_field_list TYPE ddfields.
