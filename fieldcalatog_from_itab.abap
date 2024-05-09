@@ -31,7 +31,7 @@ ENDCLASS.
 
 START-OF-SELECTION.
   "Get data from any table
-  SELECT  FROM sflight INTO TABLE @DATA(gt_sflight) UP TO 50 ROWS.
+  SELECT * FROM sflight INTO TABLE @DATA(gt_sflight) UP TO 50 ROWS.
 
   "Create field catalog from an internal table
   DATA(gt_fieldcatalog) = zca_cl_alv=>create_fieldcatalog_from_itab( gt_sflight ).
