@@ -15,15 +15,15 @@ CLASS zca_cl_alv IMPLEMENTATION.
     "Create a line of the input table
     CREATE DATA ls_table_line LIKE LINE OF it_table.
     "Get table description from the the line of the input table
-    lo_table_desc = cl_abap_structdescr=describe_by_data_ref( ls_table_line ).
+    lo_table_desc ?= cl_abap_structdescr=>describe_by_data_ref( ls_table_line ).
     "Read the structure of the table from table description
-    lt_field_list = cl_salv_data_descr=read_structdescr( lo_table_desc ).
+    lt_field_list = cl_salv_data_descr=>read_structdescr( lo_table_desc ).
 
-    LOOP AT lt_field_list ASSIGNING FIELD-SYMBOL(ls_field_list).
+    LOOP AT lt_field_list ASSIGNING FIELD-SYMBOL(<ls_field_list>).
 
       "Fill Returning field catalog table (TYPE lvc_t_fcat) from the field list.
-      APPEND INITIAL LINE TO rt_fieldcatalog ASSIGNING FIELD-SYMBOL(ls_fieldcatalog).
-      MOVE-CORRESPONDING ls_field_list TO ls_fieldcatalog.
+      APPEND INITIAL LINE TO rt_fieldcatalog ASSIGNING FIELD-SYMBOL(<ls_fieldcatalog>).
+      MOVE-CORRESPONDING <ls_field_list> TO <ls_fieldcatalog>.
 
     ENDLOOP.
   ENDMETHOD.
