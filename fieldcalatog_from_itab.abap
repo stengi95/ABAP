@@ -7,7 +7,7 @@ CLASS zca_cl_alv DEFINITION.
 ENDCLASS.
 
 CLASS zca_cl_alv IMPLEMENTATION.
-  METHOD create_fieldcatalog_from_itab.
+  CLASS-METHOD create_fieldcatalog_from_itab.
     DATA lo_table_desc TYPE REF TO cl_abap_structdescr.
     DATA ls_table_line       TYPE REF TO data.
     DATA lt_field_list TYPE ddfields.
@@ -34,13 +34,13 @@ START-OF-SELECTION.
   SELECT  FROM sflight INTO TABLE @DATA(gt_sflight) UP TO 50 ROWS.
 
   "Create field catalog from an internal table
-  DATA(gt_fieldcatalog) = zca_cl_alv=create_fieldcatalog_from_itab( gt_sflight ).
+  DATA(gt_fieldcatalog) = zca_cl_alv=>create_fieldcatalog_from_itab( gt_sflight ).
   "Create and connect GUI container with the custom container of screen 0100.
   DATA(go_container)  = NEW cl_gui_custom_container( container_name = 'GV_CONTAINER_0100' ).
   "Create and connect ALV to GUI container.
   DATA(go_alv_grid) = NEW cl_gui_alv_grid( i_parent = go_container ).
   "Display ABAP List Viewer
-  go_alv_grid-set_table_for_first_display( CHANGING it_outtab       = gt_sflight
-                                                    it_fieldcatalog = gt_fieldcatalog ).
+  go_alv_grid->set_table_for_first_display( CHANGING it_outtab       = gt_sflight
+                                                     it_fieldcatalog = gt_fieldcatalog ).
   "Call Screen 0100 to see the ALV.
   CALL SCREEN 0100.
